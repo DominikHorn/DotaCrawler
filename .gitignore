@@ -1,5 +1,12 @@
 # PostgreSQL data
 ./data
 
+# IntelliJ
+.idea/
+
+# Gradle
+.gradle
+build/
+
 # MacOS specific files
 .DS_Store
