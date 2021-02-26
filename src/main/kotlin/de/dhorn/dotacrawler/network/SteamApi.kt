@@ -4,6 +4,7 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.util.concurrent.CompletableFuture
 
 class SteamApi(val token: String) {
     private val client = HttpClient
@@ -22,12 +23,11 @@ class SteamApi(val token: String) {
         return result
     }
 
-    fun request(route: Route, parameters: Map<String, String>): HttpResponse<String> {
-        val defaultParameters = mapOf(Pair("key", token), Pair("format", "json"), Pair("language", "en"))
+    fun request(route: Route, parameters: Map<String, String>): CompletableFuture<HttpResponse<String>> {
+        val defaultParameters = mapOf(Pair("key", token), Pair("format", "json"), Pair("language", "en_us"))
         val encodedParams = encodeParameters(defaultParameters + parameters)
 
         val url = "http://api.steampowered.com/${route.endpoint}?$encodedParams"
-        print("URL: $url")
 
         val request = HttpRequest
             .newBuilder()
@@ -35,8 +35,7 @@ class SteamApi(val token: String) {
             .uri(URI.create(url))
             .build()
 
-//        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-        return client.send(request, HttpResponse.BodyHandlers.ofString())
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
     }
 
     enum class Route(val endpoint: String) {

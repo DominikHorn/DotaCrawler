@@ -10,6 +10,9 @@ fun main(args: Array<String>) {
     }
 
     val steam = SteamApi(token)
-    val res = steam.request(SteamApi.Route.GET_MATCH_HISTORY_BY_SEQUENCE_NUM, mapOf(Pair("start_at_match_seq_num", "5000000"), Pair("matches_requested", "10")))
-    println(res.body())
+
+    val params = mapOf(Pair("start_at_match_seq_num", "5000000"), Pair("matches_requested", "10"))
+    steam.request(SteamApi.Route.GET_MATCH_HISTORY_BY_SEQUENCE_NUM, params).thenAccept {
+        print(it.body())
+    }
 }
