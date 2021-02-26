@@ -23,7 +23,7 @@ class SteamApi(val token: String) {
         return result
     }
 
-    fun request(route: Route, parameters: Map<String, String>): CompletableFuture<HttpResponse<String>> {
+    fun request(route: Route, parameters: Map<String, String>): HttpResponse<String> {
         val defaultParameters = mapOf(Pair("key", token), Pair("format", "json"), Pair("language", "en_us"))
         val encodedParams = encodeParameters(defaultParameters + parameters)
 
@@ -35,7 +35,7 @@ class SteamApi(val token: String) {
             .uri(URI.create(url))
             .build()
 
-        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+        return client.send(request, HttpResponse.BodyHandlers.ofString())
     }
 
     enum class Route(val endpoint: String) {
