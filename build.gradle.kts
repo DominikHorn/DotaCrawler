@@ -10,10 +10,18 @@ version = "1.0"
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
+val exposedVersion: String by project
 dependencies {
     testImplementation(kotlin("test-junit"))
+
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+
+    implementation("org.postgresql:postgresql:42.1.4")
 }
 
 tasks.test {
