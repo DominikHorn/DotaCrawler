@@ -1,16 +1,12 @@
 services:
   crawler:
     build: .
-    environment:
-      - STEAM_DEV_TOKEN
     links:
       - database
   database:
     image: postgres
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_PASSWORD: banTechiesPls
     volumes:
       - data:/var/lib/postgresql/data
 volumes:
