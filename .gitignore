@@ -2,7 +2,7 @@
 .env
 
 # PostgreSQL data
-./data
+data/
 
 # IntelliJ
 .idea/
