@@ -22,6 +22,8 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
 
     implementation("org.postgresql:postgresql:42.1.4")
+
+    implementation("com.beust:klaxon:5.4")
 }
 
 tasks.test {

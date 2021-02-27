@@ -4,9 +4,9 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.util.concurrent.CompletableFuture
+import java.util.*
 
-class SteamApi(val token: String) {
+abstract class SteamApi(val token: String) {
     private val client = HttpClient
         .newBuilder()
         .build()
@@ -23,11 +23,21 @@ class SteamApi(val token: String) {
         return result
     }
 
-    fun request(route: Route, parameters: Map<String, String>): HttpResponse<String> {
+    // Minimum amount of milliseconds between requests
+    abstract val requestThrottle: Long
+    private var lastRequestTime: Long = 0
+
+    fun request(route: String, parameters: Map<String, String>): HttpResponse<String> {
+        val delta = Date().time - lastRequestTime
+        if (delta < requestThrottle) {
+            Thread.sleep(requestThrottle - delta)
+        }
+        lastRequestTime = Date().time
+
         val defaultParameters = mapOf(Pair("key", token), Pair("format", "json"), Pair("language", "en_us"))
         val encodedParams = encodeParameters(defaultParameters + parameters)
 
-        val url = "http://api.steampowered.com/${route.endpoint}?$encodedParams"
+        val url = "http://api.steampowered.com/$route?$encodedParams"
 
         val request = HttpRequest
             .newBuilder()
@@ -36,9 +46,5 @@ class SteamApi(val token: String) {
             .build()
 
         return client.send(request, HttpResponse.BodyHandlers.ofString())
-    }
-
-    enum class Route(val endpoint: String) {
-        GET_MATCH_HISTORY_BY_SEQUENCE_NUM("IDOTA2Match_570/GetMatchHistoryBySequenceNum/v1")
     }
 }

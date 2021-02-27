@@ -2,7 +2,6 @@ package de.dhorn.dotacrawler.storage.types
 
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.transactions.transaction
 
 object MatchHeroes: Table() {
     val matchId = (integer("match_id") references Matches.id)

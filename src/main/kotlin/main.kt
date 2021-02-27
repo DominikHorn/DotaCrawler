@@ -1,5 +1,7 @@
+import de.dhorn.dotacrawler.network.DotaApi
 import de.dhorn.dotacrawler.network.SteamApi
 import de.dhorn.dotacrawler.storage.Storage
+import java.util.*
 import kotlin.system.exitProcess
 
 fun getSteamApiToken(): String {
@@ -31,19 +33,16 @@ fun getSteamApiToken(): String {
 //    => 50 requests per hour should suffice, i.e., one request per minute tops during normal operations
 fun main(args: Array<String>) {
     // Instantiate library
-    val steam = SteamApi(getSteamApiToken())
+    val dotaApi = DotaApi(getSteamApiToken())
     val storage = Storage.localPostgres()
 
     // Initialize storage
     storage.create()
 
-    // TODO: find initial sequence number through search algorithm
-
-    val params = mapOf(Pair("start_at_match_seq_num", "5000000"), Pair("matches_requested", "10"))
-    val response = steam.request(SteamApi.Route.GET_MATCH_HISTORY_BY_SEQUENCE_NUM, params)
-    print(response.body())
-
-
+    // Find initial sequence number through search algorithm
+    // TODO: if we already have records in the database that are up to date,
+    //  start with last crawled MSN!
+    print("Result: ${dotaApi.firstMSNAtMost2WeeksAgo()}")
 
 
     // Further TODO:
