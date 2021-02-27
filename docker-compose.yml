@@ -3,11 +3,16 @@ services:
     build: .
     links:
       - database
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST
   database:
     image: postgres
+    restart: always
     ports:
       - "5432:5432"
     volumes:
-      - data:/var/lib/postgresql/data
-volumes:
-  data: {}
+      - ./data:/var/lib/postgresql/data
+    env_file:
+      - .env

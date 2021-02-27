@@ -2,6 +2,10 @@
 
 PROJECT_DIR=$(dirname "$0")
 
+# Create data/ directory for postgresql data
+mkdir ${PROJECT_DIR}/data
+
+# Create .env file
 TEMPLATE_FILE=template.env
 OUTPUT_FILE=.env
 
