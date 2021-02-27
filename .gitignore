@@ -1,5 +1,5 @@
 # Secrets
-steam_dev_token.env
+.env
 
 # PostgreSQL data
 ./data
