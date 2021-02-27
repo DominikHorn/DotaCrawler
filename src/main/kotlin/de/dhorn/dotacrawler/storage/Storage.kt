@@ -70,7 +70,7 @@ class Storage(url: String, driver: String, user: String, password: String) {
             print("PASSWORD: $password")
 
             return Storage(
-                url = "jdbc:postgresql://localhost:5432/$database",
+                url = "jdbc:postgresql://database:5432/$database",
                 driver = "org.postgresql.Driver",
                 user = user,
                 password = password
