@@ -19,7 +19,9 @@ class Storage(url: String, driver: String, user: String, password: String) {
     )
 
     init {
-        tryConnect()
+        if (tryConnect()) {
+            create()
+        }
     }
 
     private fun tryConnect(maxRetries: Int = -1, timeBetweenRetries: Long = 5000): Boolean {
@@ -40,7 +42,7 @@ class Storage(url: String, driver: String, user: String, password: String) {
         return success
     }
 
-    fun create() {
+    private fun create() {
         transaction(connection) {
             exec("""
                 DO $$ BEGIN

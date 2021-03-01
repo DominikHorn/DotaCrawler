@@ -16,40 +16,28 @@ fun getSteamApiToken(): String {
     return token
 }
 
-// Algorithm Idea:
-// 1. Find first match sequence number we want (timestamp >= oneWeekAgo)
-//      1.1. If DB is empty or last match is to long ago, use through exponential search (?) & request 1 match each
-//      1.2. Else continue from last crawled sequence number
-// 2. Starting at last crawled sequence number, continuously request 100 matches every 3 seconds until we catch up
-//      2.1. Decode to JSON
-//      2.2. M2M to DB Schema
-//      2.3. Store in DB
-//
-//      NOTE: 1 request every 3 seconds
-//        => 20 requests per minute
-//        => 1200 requests per hour
-//        => 120 000 matches crawled per hour (~1 day of dota matches per hour, i.e., 24x realtime speed)
-// 3. Dynamically throttle requests as is fit i.e., adjust sleep between crawls based on how caught up we are.
-//    => 50 requests per hour should suffice, i.e., one request per minute tops during normal operations
 fun main(args: Array<String>) {
     // Instantiate library
     val dotaApi = DotaApi(getSteamApiToken())
     val storage = Storage.localPostgres()
 
-    // Initialize storage
-    storage.create()
-
     // Find initial sequence number through search algorithm
-    // TODO: if we already have records in the database that are up to date,
-    //  start with last crawled MSN!
-    print("Result: ${dotaApi.firstMSNAtMost2WeeksAgo()}")
+    // TODO: if we have records in the DB that are not older than 2 weeks, use newest MSN
+    val firstMSN = dotaApi.firstMSNAtMost2WeeksAgo()
 
+    // Starting at last crawled sequence number, continuously request 100 matches every 3 seconds until we catch up;
+    // Afterwards, 2 request per minute should suffice (12000 matches / hour seems realistic)
+    //
+    // NOTE: 1 request every 3 seconds
+    //   => 20 requests per minute
+    //   => 1200 requests per hour
+    //   => 120 000 matches crawled per hour (~1 day of dota matches per hour, i.e., 24x realtime speed)
 
-    // Further TODO:
-    // - implement queries + REST endpoints as separate kotlin (?) server
-    // - intelligently set indices on DB to optimize said queries
-    // - crawl additional data (heroes, items etc) and serve them through dedicated endpoints
-    // - nice documentation README/Swagger API etc
-    // - deploy to google cloud or equivalent (stay as platform independent as possible!)
-    // - switch app to using these dedicated endpoints
+    // TODO: (other microservice/app/general)
+    //  - implement queries + set indices on DB to optimize
+    //  - build REST endpoints as separate kotlin (?) microservice with nice documentation (Swagger)
+    //  - intelligently set indices on DB to optimize said queries
+    //  - nice documentation README for project
+    //  - deploy to google cloud or equivalent (stay as platform independent as possible!)
+    //  - crawl additional data (heroes, items etc), build endpoints for those and use them in the app
 }
