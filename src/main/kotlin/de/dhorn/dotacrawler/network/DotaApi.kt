@@ -2,10 +2,8 @@ package de.dhorn.dotacrawler.network
 
 import com.beust.klaxon.Klaxon
 import de.dhorn.dotacrawler.network.types.Match
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.pow
-import kotlin.system.exitProcess
 
 class DotaApi(token: String) : SteamApi(token) {
     // We may only make one api call every 1 seconds
@@ -42,13 +40,12 @@ class DotaApi(token: String) : SteamApi(token) {
     }
 
     /**
-     * Returns a match sequence number of the first match played at most 2 weeks ago
+     * Returns the match sequence number of the first match that happened after
+     * the given timestamp. NOTE: Only set
      */
-    fun firstMSNAtMost2WeeksAgo(): Long? {
-        val twoWeeksAgo = (Date().time / 1000) - 14 * 24 * 60 * 60
-
+    fun firstMSNAfter(timestamp: Long, startSequenceNumber: Long = 0): Long? {
         // Obtain bounds where sequence number can lay through exponential search
-        val bounds = searchRangeBounds(timestamp = twoWeeksAgo, startSequenceNumber = (2.0).pow(32).toLong())
+        val bounds = searchRangeBounds(timestamp = timestamp, startSequenceNumber = startSequenceNumber)
         var lowerBound = bounds.first
         var upperBound = bounds.second
 
@@ -61,11 +58,11 @@ class DotaApi(token: String) : SteamApi(token) {
             match = getMatchBySequenceNumber(testMSN)
 
             // Update current best match fitting searched value
-            if (match != null && (bestMatch == null || bestMatch.start_time > match.start_time) && match.start_time >= twoWeeksAgo) {
+            if (match != null && (bestMatch == null || bestMatch.start_time > match.start_time) && match.start_time >= timestamp) {
                 bestMatch = match
             }
 
-            if (match == null || match.start_time > twoWeeksAgo) {
+            if (match == null || match.start_time > timestamp) {
                 // Continue searching to the left
                 upperBound -= interval / 2
             } else {
@@ -75,6 +72,16 @@ class DotaApi(token: String) : SteamApi(token) {
         }
 
         return bestMatch?.sequence_number
+    }
+
+    /**
+     * Returns a match sequence number of the first match played at most 2 weeks ago
+     */
+    fun firstMSNAtMost2WeeksAgo(): Long? {
+        val twoWeeksAgo = (Date().time / 1000) - 14 * 24 * 60 * 60
+        val startSequenceNumber = (2.0).pow(32).toLong()
+
+        return firstMSNAfter(timestamp = twoWeeksAgo, startSequenceNumber = startSequenceNumber)
     }
 
     enum class Route(val endpoint: String) {
